@@ -3,3 +3,4 @@ ENV
 env.py
 .idea/
 .idea
+.DS_Store
