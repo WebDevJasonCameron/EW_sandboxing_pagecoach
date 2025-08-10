@@ -1,3 +1,5 @@
 ENV
 .env
 env.py
+.idea/
+.idea
