@@ -1,10 +1,67 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+<!doctype html><meta charset="utf-8"/>
+<title>PageCoach MVP</title>
+<style>
+  body{font:16px system-ui;margin:2rem;max-width:800px}
+  li{margin:.4rem 0}
+  .small{opacity:.7;font-size:.9em}
+</style>
+<h1>PageCoach</h1>
+<p class="small">Upload a sketch/screenshot. Choose reading order. Get 5–10 concrete notes.</p>
 
-</body>
-</html>
+<form id="f">
+  <input type="file" name="image" accept="image/*" required>
+  <label><input type="radio" name="style" value="western" checked> Western (L→R)</label>
+  <label><input type="radio" name="style" value="manga"> Manga (R→L)</label>
+  <button>Analyze</button>
+</form>
+
+<ol id="out"></ol>
+
+<script>
+const f = document.getElementById('f'), out = document.getElementById('out');
+f.onsubmit = async (e)=> {
+  e.preventDefault();
+  out.innerHTML = "<li>Analyzing…</li>";
+  const fd = new FormData(f);
+  const r = await fetch('/analyze-page', { method:'POST', body: fd });
+  if (!r.ok) { out.innerHTML = `<li>Error: ${r.status}</li>`; return; }
+  const j = await r.json();
+  out.innerHTML = "";
+  (j.notes||["No notes returned"]).forEach(n=>{
+    const li = document.createElement('li'); li.textContent = n; out.append(li);
+  });
+};
+
+async function runAnalysis() {
+  resultsEl.textContent = "Analyzing…";
+  const body = {
+    url: urlInput.value.trim(),
+    goals: goalsInput.value.trim() || null
+  };
+
+  try {
+    const res = await fetch("/analyze-page", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify(body)
+    });
+
+    const payload = await res.json();
+
+    if (!res.ok) {
+      // Show friendly message from server
+      resultsEl.textContent = `Error: ${payload.detail || 'Something went wrong.'}`;
+      return;
+    }
+
+    // success path
+    const data = typeof payload.data === "string" ? JSON.parse(payload.data) : payload.data;
+    // render your JSON results...
+    resultsEl.textContent = JSON.stringify(data, null, 2);
+
+  } catch (err) {
+    resultsEl.textContent = `Network or parse error: ${err.message || err}`;
+  }
+}
+
+</script>
