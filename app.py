@@ -13,7 +13,13 @@ except Exception:
 
 # --- Optional env.py support (local dev convenience) -------------------------
 # Create a file named env.py next to this app with:  OPENAI_API_KEY = "sk-...."
-
+try:
+    import env
+    _env = env.API_KEY
+    if getattr(_env, "OPENAI_API_KEY", None):
+        os.environ.setdefault("OPENAI_API_KEY", _env.OPENAI_API_KEY)
+except ImportError:
+    pass
 # -----------------------------------------------------------------------------
 
 MODEL = os.getenv("MODEL", "gpt-4o-mini")

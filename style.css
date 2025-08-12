@@ -1,0 +1,14 @@
+  body {
+      font: 16px system-ui;
+      margin: 2rem;
+      max-width: 800px;
+  }
+
+  li {
+      margin: .4rem 0;
+  }
+
+  .small {
+      opacity: .7;
+      font-size: .9em;
+  }
